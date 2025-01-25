@@ -22,41 +22,26 @@ const saveMessage = async (req, res) => {
     }
 };
 
-// exports.saveMessage = async (req, res) => {
-//     try {
-//         const { sender, receiver, message } = req.body
-//         const newMessage = new messageModel({
-//             sender,
-//             receiver,
-//             message
-//         })
-//         await newMessage.save()
-        
-//         res.status(200).json({
-//             message: newMessage
-//         })
-//     } catch (error) {
-//         res.status(500).json({
-//             message: error.message
-//         })
-//     }
-// }
 
-const receiveMessage = async(req,res)=>{
+const receiveMessage = async (req, res) => {
     try {
+        const { sender, receiver } = req.query;
 
-        const receiveMessage = await messageModel.find()
+        // Fetch messages strictly between the two users
+        const messages = await messageModel.find({
+            $or: [
+                { sender, receiver }, // From sender to receiver
+                { sender: receiver, receiver: sender }, // From receiver to sender
+            ],
+        }).sort({ createdAt: 1 }); // Optional: Sort messages by creation time
 
-        res.status(200).json({
-            message:receiveMessage
-        })
-        
+        res.status(200).json({ message: messages });
     } catch (error) {
-        res.status(500).json({
-            message: error
-        })
+        res.status(500).json({ message: error.message });
     }
-}
+};
+
+
 
 module.exports = {
     saveMessageToDB,
