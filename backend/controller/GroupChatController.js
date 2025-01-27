@@ -23,8 +23,8 @@ const createGroup = async (req, res) => {
 };
 
 
-const saveGroupChat = async(groupData)=>{
-    const {groupId,sender,message} = groupData
+const saveGroupChat = async(messageData)=>{
+    const {groupId,sender,message} = messageData
     const newMessage = new GroupMessageModel({groupId,sender,message})
     return await newMessage.save()
 }

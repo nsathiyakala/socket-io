@@ -40,24 +40,51 @@ socketServer = (server) => {
     });
 
 
-    socket.on("joinRoom",async ({groupData}) =>{
-      createGroupModel.findById(groupData.groupId).then((group)=>{
-        if(group && group.members.includes(groupData.sender)){
-          socket.join(groupData.groupId)
-          console.log(`User ${groupData.sender} joined room ${groupData.groupId}`);
+    // socket.on("joinRoom",async ({groupData}) =>{
+    //   console.log(groupData);
+      
+    //   createGroupModel.findById(groupData.groupId).then((group)=>{
+    //     if(group && group.members.includes(groupData.sender)){
+    //       socket.join(groupData.groupId)
+    //       console.log(`User ${groupData.sender} joined room ${groupData.groupId}`);
         
-        }
-        else{
-          console.log("User not found in group");
-        }
-      })
-    })
+    //     }
+    //     else{
+    //       console.log("User not found in group");
+    //     }  
+    //   })
+    // })
 
-    socket.on("sendGroupMessage", async(messagedata)=>{
+    socket.on("joinRoom", async (groupData) => {
+      console.log(groupData);
+      
       try {
-        const savedMessage = await saveGroupChat(messagedata)
+        const group = await createGroupModel.findById(groupData.groupId);
+        console.log(group);
+        
+        if (group && group.members.includes(groupData.sender)) {
+          socket.join(groupData.groupId);
+          console.log(`User ${groupData.sender} joined room ${groupData.groupId}`);
+        } else {
+          socket.emit("error", "User not found in group or group does not exist");
+        }
+      } catch (err) {
+        console.error("Error in joinRoom:", err);
+        socket.emit("error", "An error occurred while joining the room");
+      }
+    });
+    
+    
+      
+    socket.on("sendGroupMessage", async(messageData)=>{
+      console.log("messageData",messageData);
+      
+      try {
+        const savedMessage = await saveGroupChat(messageData)
         console.log("savedMessage", savedMessage);
-        io.to(messagedata.groupId).emit("receiveGroupMessage", savedMessage)
+        const emmission = io.to(messageData.groupId).emit("receiveGroupMessage", savedMessage)
+        console.log(emmission);
+        
       } catch (error) {
         socket.emit("error", "Failed to send message");
       }

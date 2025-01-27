@@ -4,12 +4,13 @@ import io from "socket.io-client";
 
 const socket = io("http://localhost:8000"); // Replace with your backend URL
 
-const GroupChat = () => {
+const NewGroupChat = () => {
   const [groupId, setGroupId] = useState("");
   const [userId, setUserId] = useState("");
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [joined, setJoined] = useState(false);
+  const [group,setGroup] = useState(false)
 
   useEffect(() => {
     if (userId && groupId) {
@@ -66,12 +67,21 @@ const GroupChat = () => {
   };
 
   // Listen for incoming messages
+
+
+    //  createGroup
+//   const createGroup = () =>{
+//         setGroup(true)
+        
+//   }
  
 
   return (
     <>
     <div className="group-chat-container" style={{ padding: "20px" }}>
+        
       {!joined ? (
+        <>
         <div>
           <h2>Join Group Chat</h2>
           <input
@@ -94,41 +104,36 @@ const GroupChat = () => {
             Join Group
           </button>
         </div>
+        {/* <div onClick={setGroup(true)}>Create Group</div> */}
+        </>
+        
       ) : (
-        <div>
-          <h2>Group Chat</h2>
-          <div
-            className="chat-box"
-            style={{
-              border: "1px solid #ccc",
-              borderRadius: "10px",
-              padding: "10px",
-              height: "300px",
-              overflowY: "scroll",
-              marginBottom: "10px",
-            }}
-          >
-            {messages.length > 0 ? (
-              messages.map((msg, index) => (
-                <div key={index} style={{ margin: "5px 0" }}>
-                  <strong>{msg.sender}:</strong> {msg.message}
-                </div>
-              ))
-            ) : (
-              <p>No messages yet...</p>
-            )}
-          </div>
+        <div className="chat-container">
+        <div className="chat-header">Group Chat</div>
+        <div className="chat-body">
+          {messages.map((msg, index) => (
+            <div
+              key={index}
+              className={`message ${msg.sender === userId ? "sent" : "received"}`}
+            >
+              <div className="bubble">
+                <strong>{msg.sender}:</strong> {msg.message}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="chat-footer">
+          
           <input
             type="text"
-            placeholder="Type a message"
+            placeholder="Type a message..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            style={{ width: "70%", padding: "10px" }}
+            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
           />
-          <button onClick={sendMessage} style={{ padding: "10px 20px", marginLeft: "10px" }}>
-            Send
-          </button>
+          <button onClick={sendMessage}>Send</button>
         </div>
+      </div>
       )}
     </div>
     </>
@@ -139,4 +144,4 @@ const GroupChat = () => {
   );
 };
 
-export default GroupChat;
+export default NewGroupChat;

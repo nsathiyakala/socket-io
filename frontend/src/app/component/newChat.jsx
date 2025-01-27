@@ -141,7 +141,8 @@ const Chat = () => {
   
 
   return (
-    <div className="chat-container">
+    <>
+     <div className="chat-container">
       <div className="chat-header">Chat</div>
       <div className="chat-body">
         {messages.map((msg, index) => (
@@ -178,6 +179,19 @@ const Chat = () => {
         <button onClick={sendMessage}>Send</button>
       </div>
     </div>
+
+
+        <div style={{display:"flex", justifyContent:"center"}}>
+        <button >
+          <a href="/group">
+          Group Chat
+          </a>
+        </button>
+        
+        </div>
+
+    </>
+   
   );
 };
 
