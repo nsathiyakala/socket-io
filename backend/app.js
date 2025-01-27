@@ -6,11 +6,11 @@ const dotenv = require("dotenv")
 const path = require("path")
 const cors = require("cors")
 const socketServer = require("./socket")
-const router = require("./router")
+const SingleChatrouter = require("./routes/SingleChatRouter")
+const GroupChatRouter = require("./routes/groupChatRouter")
 
 
 const mongooseConnection = require("./config/mongooseConnection")
-const chatController = require("./controller/ChatController")
 
 dotenv.config({path: path.join(__dirname, "config", "config.env")})
 app.use(express.json())
@@ -18,7 +18,8 @@ app.use(cors())
 socketServer(server) 
 mongooseConnection()
 
-app.use("/chat",router)
+app.use("/chat",SingleChatrouter)
+app.use("/group", GroupChatRouter)
 
 const port = process.env.PORT || 8000
 
