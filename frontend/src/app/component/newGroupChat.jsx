@@ -11,6 +11,9 @@ const NewGroupChat = () => {
   const [messages, setMessages] = useState([]);
   const [joined, setJoined] = useState(false);
   const [group,setGroup] = useState(false)
+  const [groupName,setGroupName] = useState("")
+  const [users,setUsers] = useState("")
+  // const [members,setMembers] = useState([])
 
   useEffect(() => {
     if (userId && groupId) {
@@ -28,7 +31,7 @@ const NewGroupChat = () => {
 
     // Cleanup on component unmount
     return () => socket.off("receiveGroupMessage");
-  }, [userId,groupId]);
+  }, [userId,groupId,messages]);
 
   // Join group on button click
   const joinGroup = () => {
@@ -54,7 +57,54 @@ const NewGroupChat = () => {
   
   };
 
-  // Send message
+ 
+
+  // Listen for incoming messages
+
+
+    const createGroup = () => {
+      const groupMembers = users.split(",");
+      console.log(groupMembers);
+  
+      // setMembers(groupMembers);
+      // console.log(members);
+      
+  
+      const groupData = {
+        groupId:groupName,
+        members: groupMembers,
+        
+      };
+      console.log(groupData);
+      
+      fetch("http://localhost:8000/group/createGroup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(groupData),
+      }).then((res) => res.json()).then((data) => {
+        if(data){
+          console.log("Group created successfully");
+          console.log(data);
+          setJoined(true);
+          setUserId(data.members[0])
+          console.log(userId);
+          
+          setGroupId(data._id)
+          console.log(groupId);
+          
+        }
+        else {
+           console.error("Failed to create group");
+          }
+        
+      });
+
+    };
+
+
+     // Send message
   const sendMessage = () => {
     if (!message) return;
     const messageData = { groupId, sender:userId, message };
@@ -65,15 +115,7 @@ const NewGroupChat = () => {
     
     setMessage(""); // Clear input after sending
   };
-
-  // Listen for incoming messages
-
-
-    //  createGroup
-//   const createGroup = () =>{
-//         setGroup(true)
-        
-//   }
+ 
  
 
   return (
@@ -104,7 +146,24 @@ const NewGroupChat = () => {
             Join Group
           </button>
         </div>
-        {/* <div onClick={setGroup(true)}>Create Group</div> */}
+        <button onClick={()=>setGroup(true)}>Create New Group</button>
+        {group && (
+          <div style={{marginTop:"10px"}}>
+            <input 
+            type="text" 
+            placeholder="Group Name" 
+            value={groupName}
+            onChange={(e)=>setGroupName(e.target.value)}/> <br />
+            <input style={{marginTop:"10px"}}
+             type="text" 
+             placeholder="Add Group Members"
+             value={users} 
+             onChange={(e)=> setUsers(e.target.value)
+             
+             }/> <br />
+            <button style={{marginTop:"10px"}} onClick={createGroup}>Create Group</button>
+          </div>
+        )}
         </>
         
       ) : (
